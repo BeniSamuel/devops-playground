@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  nziza-db:
+    image: postgres:16-alpine
+    container_name: nziza-postgres
+    environment:
+      POSTGRES_DB: nziza_banking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: beni@ish1
+    volumes:
+      - postgres
