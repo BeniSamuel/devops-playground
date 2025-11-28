@@ -21,24 +21,24 @@ public class UserService {
     }
 
     public User getUserById (UUID id) {
-        return this.userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!!!"));
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found!!!"));
     }
 
     public User getUserByEmail (String email) {
-        return this.userRepository.getUserByEmail(email).orElseThrow(() -> new NotFoundException("User not found!!!"));
+        return userRepository.getUserByEmail(email).orElseThrow(() -> new NotFoundException("User not found!!!"));
     }
 
     public User createUser (RegisterDto registerDto) {
-        boolean exist = this.userRepository.getUserByEmail(registerDto.getEmail()).isPresent();
+        boolean exist = userRepository.getUserByEmail(registerDto.getEmail()).isPresent();
         if (exist) {
             throw new BadRequestException("User with that email already exist!!!");
         }
         User newUser = new User(registerDto.getName(), registerDto.getEmail(), registerDto.getPassword(), registerDto.getRole(), registerDto.getJoined_at());
-        return this.userRepository.save(newUser);
+        return userRepository.save(newUser);
     }
 
     public User updateUserById (UUID id, RegisterDto registerDto) {
-        User user = this.getUserById(id);
+        User user = getUserById(id);
 
         user.setEmail(registerDto.getEmail());
         user.setName(registerDto.getName());
@@ -49,7 +49,7 @@ public class UserService {
     }
 
     public Boolean deleteUserById (UUID id) {
-        User user = this.getUserById(id);
+        User user = getUserById(id);
         userRepository.delete(user);
         return true;
     }
