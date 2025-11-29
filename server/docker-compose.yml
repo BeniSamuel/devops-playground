@@ -1,4 +1,4 @@
-version: "3.9"
+# docker-compose.yml
 services:
   nziza-db:
     image: postgres:16-alpine
@@ -8,4 +8,35 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: beni@ish1
     volumes:
-      - postgres
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"           # only needed if you want to connect from host
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nziza_banking"]  # fixed syntax
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nziza-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: benisamuel/nziza-banking:v1.0.0
+    container_name: nziza-banking-backend-app
+    environment:
+      # VERY IMPORTANT: use the service name, NOT localhost
+      SPRING_DATASOURCE_URL: jdbc:postgresql://nziza-db:5432/nziza_banking
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: beni@ish1
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    depends_on:
+      nziza-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+# Declare the named volume here (must be at top level, not inside services)
+volumes:
+  postgres_data:
